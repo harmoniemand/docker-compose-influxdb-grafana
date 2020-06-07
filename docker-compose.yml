@@ -5,36 +5,56 @@ services:
     ports:
       - '8086:8086'
     volumes:
-      - influxdb-storage:/var/lib/influxdb
+      - /data/dashboard-hmnd-de/influxdb-storage:/var/lib/influxdb
     environment:
       - INFLUXDB_DB=db0
       - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
       - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:influx.dashboard.hmnd.de"
+      - "traefik.port=8086"
+      - "traefik.docker.network=traefik_net"
+    networks:
+      - backend
   chronograf:
     image: chronograf:latest
-    ports:
-      - '127.0.0.1:8888:8888'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:admin.influx.dashboard.hmnd.de"
+      - "traefik.port=8888"
+      - "traefik.docker.network=traefik_net"
     volumes:
-      - chronograf-storage:/var/lib/chronograf
+      - /data/dashboard-hmnd-de/chronograf-storage:/var/lib/chronograf
     depends_on:
       - influxdb
     environment:
       - INFLUXDB_URL=http://influxdb:8086
       - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
       - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
+    networks:
+      - backend
+      - traefik_net
   grafana:
     image: grafana/grafana:latest
-    ports:
-      - '3000:3000'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:dashboard.hmnd.de"
+      - "traefik.port=3000"
+      - "traefik.docker.network=traefik_net"
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - /data/dashboard-hmnd-de/grafana-storage:/var/lib/grafana
       - ./grafana-provisioning/:/etc/grafana/provisioning
     depends_on:
       - influxdb
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-volumes:
-  influxdb-storage:
-  chronograf-storage:
-  grafana-storage:
+    networks:
+      - backend
+      - traefik_net
+
+networks:
+  backend:
+  traefik_net:
+    external: true
