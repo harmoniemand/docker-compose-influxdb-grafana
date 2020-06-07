@@ -22,24 +22,24 @@ services:
       - "traefik.docker.network=traefik_net"
     networks:
       - backend
-  chronograf:
-    image: chronograf:latest
-    labels:
-      - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:admin.influx.dashboard.hmnd.de"
-      - "traefik.port=8888"
-      - "traefik.docker.network=traefik_net"
-    volumes:
-      - /data/dashboard-hmnd-de/chronograf-storage:/var/lib/chronograf
-    depends_on:
-      - influxdb
-    environment:
-      - INFLUXDB_URL=http://influxdb:8086
-      - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
-      - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
-    networks:
-      - backend
-      - traefik_net
+#  chronograf:
+#    image: chronograf:latest
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.frontend.rule=Host:admin.influx.dashboard.hmnd.de"
+#      - "traefik.port=8888"
+#      - "traefik.docker.network=traefik_net"
+#    volumes:
+#      - /data/dashboard-hmnd-de/chronograf-storage:/var/lib/chronograf
+#    depends_on:
+#      - influxdb
+#    environment:
+#      - INFLUXDB_URL=http://influxdb:8086
+#      - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
+#      - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
+#    networks:
+#      - backend
+#      - traefik_net
   grafana:
     image: grafana/grafana:latest
     labels:
